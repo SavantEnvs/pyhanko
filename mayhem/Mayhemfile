@@ -1,0 +1,19 @@
+# Mayhem target: pyhanko — pyHanko's low-level PDF object-model reader
+# (pyhanko.pdf_utils.reader.PdfFileReader), the parsing entry point every higher-level pyHanko
+# feature (signature validation, incremental-update inspection, form filling, ...) sits on top of.
+# (Atheris/libFuzzer harness). The cmd binary is the compiled ELF launcher that drives
+# mayhem/fuzz_pdf_reader.py; Atheris instruments the pyhanko.pdf_utils modules so the run records
+# coverage (edges).
+project: savantenvs/pyhanko
+target: fuzz-pdf-reader
+
+cmds:
+  - cmd: /mayhem/pyhanko_fuzzer
+    libfuzzer: true
+    timeout: 30
+
+# Seed corpus (real-world PDF fixtures from pyHanko's own test data, covering a range of xref
+# forms, encryption filters, and known-tricky structural edge cases).
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-pdf-reader/testsuite
