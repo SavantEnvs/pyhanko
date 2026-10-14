@@ -1,0 +1,19 @@
+# seed-from: https://app.mayhem.security/savantenvs/pyhanko/fuzz-pdf-reader
+# Mined target (MINING.md): the harness on the commit before upstream's fix for infinite recursion
+# in HistoricalResolver.collect_indirect_references. It parses the PDF with
+# pdf_utils.reader.PdfFileReader, then runs the signature integrity analysis
+# (pdfstamp.sign.validation.EmbeddedPdfSignature) on each signed field. Atheris/libFuzzer; the cmd
+# is the compiled ELF launcher that drives mayhem/fuzz_pdf_reader.py.
+project: savantenvs/pyhanko
+target: fuzz-pdf-reader-mined-18e7a56
+
+cmds:
+  - cmd: /mayhem/pyhanko_fuzzer
+    libfuzzer: true
+    timeout: 30
+
+# Seed corpus (real-world PDF fixtures from pyHanko's own test data, covering a range of xref
+# forms, encryption filters, and known-tricky structural edge cases).
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-pdf-reader-mined-18e7a56/testsuite
